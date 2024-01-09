@@ -2,6 +2,8 @@
 
 Ruby client for ChalkRuby
 
+https://rubygems.org/gems/chalk_ruby
+
 ## Getting Started
 
 First, install ChalkRuby Ruby API Client via the [RubyGems](https://rubygems.org/) package manager:
