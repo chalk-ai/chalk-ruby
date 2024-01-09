@@ -1,0 +1,25 @@
+module ChalkRuby
+  module Http
+    class HttpRequester
+      @connections: Hash[String, _Connection]
+
+      attr_accessor adapter: Net::HTTP
+
+      attr_accessor logger: Logger
+
+      def initialize: (String adapter, Logger logger) -> void
+
+      def send_request: (
+          String host,
+          Symbol method,
+          String path,
+          Hash[Symbol | String, untyped] body,
+          Hash[String | Symbol, String | bool] headers,
+          Integer timeout,
+          Integer connect_timeout
+        ) -> Response
+
+      def connection: (String host) -> _Connection
+    end
+  end
+end

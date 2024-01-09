@@ -1,0 +1,6 @@
+module ChalkRuby
+  class ChalkHttpError
+    attr_accessor code: Integer
+    attr_accessor message: String
+  end
+end

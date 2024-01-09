@@ -1,0 +1,21 @@
+module ChalkRuby
+  module Http
+    class HttpRequesterChalk
+      @http_requester: Http::HttpRequester
+
+      def send_request: (
+          Symbol method,
+          String host,
+          String path,
+          Integer timeout,
+          Integer connect_timeout,
+          Hash[String | Symbol, untyped] headers,
+          ?::Hash[String | Symbol, untyped] body
+        ) -> Hash[Symbol, untyped]
+
+      private
+
+      def success?: (String http_response_code) -> bool
+    end
+  end
+end

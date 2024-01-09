@@ -1,0 +1,52 @@
+module ChalkRuby
+  class Client
+    @config: Config
+    @token: Token?
+    @transporter: Http::HttpRequesterChalk
+
+    def self.create: -> Client
+
+    def self.create_with_config: -> Client
+
+    def get_token: -> Token
+
+    def query: (
+        Hash[Symbol | String, untyped] input,
+        [String] output,
+        now: Time?,
+        staleness: Hash[String, String],
+        tags: [String]?,
+        branch: String?,
+        correlation_id: String?,
+        query_name: String?,
+        meta: Hash[String, String]?,
+        explain: bool,
+        include_meta: bool,
+        store_plan_stages: bool
+      ) -> Hash[Symbol, untyped]
+
+    private
+
+    def get_authenticated_headers: -> Hash[Symbol, String | nil]
+
+    def get_unauthenticated_headers: -> Hash[Symbol, String | nil]
+
+    def query_server_host: -> String
+
+    def query_server_request: (
+        Symbol method,
+        String path,
+        Hash[Symbol, String] body,
+        Hash[String, String] headers
+      ) -> Hash[Symbol, untyped]
+
+    def api_server_request: (
+        Symbol method,
+        String path,
+        Hash[Symbol, String] body,
+        Hash[String, String] headers
+      ) -> Hash[Symbol, untyped]
+
+    def valid_token: -> Token
+  end
+end

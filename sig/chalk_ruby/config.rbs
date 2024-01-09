@@ -1,0 +1,31 @@
+module ChalkRuby
+  class Config
+    attr_accessor client_id: String
+    attr_accessor client_secret: String
+
+    attr_accessor api_server: String
+    attr_accessor api_timeout: Integer
+
+    attr_accessor query_server: String
+    attr_accessor query_timeout: Integer
+
+    attr_accessor environment: String
+
+    attr_accessor connect_timeout: Integer
+
+    type options = {
+        client_id: String?,
+        client_secret: String?,
+        environment: String?,
+        api_server: String?,
+        query_server: String?,
+        query_timeout: Integer?,
+        api_timeout: Integer?,
+        connect_timeout: Integer?,
+        compression_type: String?
+      }
+
+    def initialize: (options opts) -> void
+
+  end
+end

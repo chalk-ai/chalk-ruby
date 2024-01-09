@@ -1,0 +1,10 @@
+module ChalkRuby
+  class Token
+    attr_accessor token: String
+    attr_accessor expires_at: DateTime
+    attr_accessor environment: String?
+    attr_accessor engines: Hash[String, String]
+
+    def expired?: -> bool
+  end
+end

@@ -1,0 +1,3 @@
+module ChalkRuby
+  VERSION : String
+end
