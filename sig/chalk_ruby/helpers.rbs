@@ -1,0 +1,15 @@
+module ChalkRuby
+  module Helpers
+    def to_json: (String | Hash[Symbol, String] body) -> String
+
+    def symbolize_hash: (Hash[Symbol | String, untyped] hash) -> Hash[Symbol, untyped]
+
+    def json_to_hash: (String json, bool symbolize_keys) -> Hash[Symbol, String]
+
+    def get_option: ([Symbol | String, String] hash, String key) -> (String | [String])
+
+    def path_encode: (String path, *String args) -> String
+
+    def self.included: (self base) -> self
+  end
+end

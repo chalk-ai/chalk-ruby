@@ -1,0 +1,35 @@
+module ChalkRuby
+  module Defaults
+    REQUESTER_CLASS : untyped
+    ADAPTER         : String
+
+    # HTTP Headers
+    # ----------------------------------------
+    HEADER_CLIENT_ID     : String
+    HEADER_CLIENT_SECRET : String
+    HEADER_ENVIRONMENT   : String
+    AUTHORIZATION_HEADER : String
+    USER_AGENT           : String
+
+    # API Servers
+    # ----------------------------------------
+    QUERY_SERVER : String
+    API_SERVER   : String
+
+    # HTTP ERROR CODES
+    # ----------------------------------------
+    ERROR_BAD_REQUEST : Integer
+    ERROR_FORBIDDEN   : Integer
+    ERROR_NOT_FOUND   : Integer
+    ERROR_TIMED_OUT   : Integer
+
+    # HTTP TIMEOUTS
+    # ----------------------------------------
+    CONNECT_TIMEOUT : Integer
+    API_TIMEOUT     : Integer
+    QUERY_TIMEOUT   : Integer
+
+
+    WAIT_TASK_DEFAULT_TIME_BEFORE_RETRY : Integer
+  end
+end
