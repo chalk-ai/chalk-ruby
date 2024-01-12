@@ -1,6 +1,6 @@
 ## ChalkRuby Ruby
 
-Ruby client for ChalkRuby
+Ruby client for Chalk!
 
 https://rubygems.org/gems/chalk_ruby
 
@@ -9,7 +9,7 @@ https://rubygems.org/gems/chalk_ruby
 First, install ChalkRuby Ruby API Client via the [RubyGems](https://rubygems.org/) package manager:
 
 ```bash
-gem install chalk_ai
+gem install chalk_ruby
 ```
 
 Then, create a new client using your client ID and client secret:
