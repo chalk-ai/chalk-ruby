@@ -6,7 +6,6 @@ require 'chalk_ruby/error'
 CLIENT_ID     = ''
 CLIENT_SECRET = ''
 
-
 RSpec.describe 'Online query' do
   it 'should accept valid queries' do
     client   = ChalkRuby::Client.create(CLIENT_ID, CLIENT_SECRET)

@@ -11,7 +11,7 @@ module ChalkRuby
                   :query_timeout,
                   :api_timeout,
                   :connect_timeout,
-                  :additional_headers,
+                  :additional_headers
 
     # Creates a new ChalkRuby::Config object for use with ChalkRuby::Client.
     #
@@ -40,15 +40,18 @@ module ChalkRuby
     # @option options [Integer?] :connect_timeout
     #   The timeout for connect operations (in seconds).
     #
+    # @option options [Hash<String, String>?] :additional_headers
+    #  Additional headers to be sent with every request. Typically not required.
+    #
     def initialize(opts = {})
-      @client_id       = opts[:client_id] || ENV['CHALK_CLIENT_ID']
-      @client_secret   = opts[:client_secret] || ENV['CHALK_CLIENT_SECRET']
-      @environment     = opts[:environment] || ENV['CHALK_ACTIVE_ENVIRONMENT']
-      @query_server    = opts[:query_server] || ENV['CHALK_QUERY_SERVER'] || Defaults::QUERY_SERVER
-      @api_server      = opts[:api_server] || ENV['CHALK_API_SERVER'] || Defaults::API_SERVER
-      @query_timeout   = opts[:query_timeout] || Defaults::API_TIMEOUT
-      @api_timeout     = opts[:api_timeout] || Defaults::QUERY_TIMEOUT
-      @connect_timeout = opts[:connect_timeout] || Defaults::CONNECT_TIMEOUT
+      @client_id          = opts[:client_id] || ENV['CHALK_CLIENT_ID']
+      @client_secret      = opts[:client_secret] || ENV['CHALK_CLIENT_SECRET']
+      @environment        = opts[:environment] || ENV['CHALK_ACTIVE_ENVIRONMENT']
+      @query_server       = opts[:query_server] || ENV['CHALK_QUERY_SERVER'] || Defaults::QUERY_SERVER
+      @api_server         = opts[:api_server] || ENV['CHALK_API_SERVER'] || Defaults::API_SERVER
+      @query_timeout      = opts[:query_timeout] || Defaults::API_TIMEOUT
+      @api_timeout        = opts[:api_timeout] || Defaults::QUERY_TIMEOUT
+      @connect_timeout    = opts[:connect_timeout] || Defaults::CONNECT_TIMEOUT
       @additional_headers = opts[:additional_headers] || {}
 
       raise ChalkError, 'No Client ID provided, please set :client_id' if @client_id.nil?

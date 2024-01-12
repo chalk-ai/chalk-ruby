@@ -4,7 +4,14 @@ module ChalkRuby
     @token: Token?
     @transporter: Http::HttpRequesterChalk
 
-    def self.create: -> Client
+    def self.create: (
+        String? client_id,
+        String? client_secret,
+        String? environment,
+        String? query_server,
+        String? api_server,
+        Hash[String, String]? additional_headers
+      ) -> Client
 
     def self.create_with_config: -> Client
 
@@ -27,7 +34,7 @@ module ChalkRuby
 
     private
 
-    def get_authenticated_headers: -> Hash[Symbol, String | nil]
+    def get_authenticated_engine_headers: (String? branch) -> Hash[Symbol, String | nil]
 
     def get_unauthenticated_headers: -> Hash[Symbol, String | nil]
 

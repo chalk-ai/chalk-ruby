@@ -1,5 +1,6 @@
 module ChalkRuby
   class Config
+    attr_accessor additional_headers: Hash[String, String]?
     attr_accessor client_id: String
     attr_accessor client_secret: String
 
@@ -22,7 +23,8 @@ module ChalkRuby
         query_timeout: Integer?,
         api_timeout: Integer?,
         connect_timeout: Integer?,
-        compression_type: String?
+        compression_type: String?,
+        additional_headers: Hash[String, String]?
       }
 
     def initialize: (options opts) -> void
