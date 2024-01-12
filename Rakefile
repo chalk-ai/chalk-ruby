@@ -17,7 +17,7 @@ namespace :test do
   Rake::TestTask.new(:integration) do |t|
     t.libs << 'test'
     t.libs << 'lib'
-    t.test_files = FileList['test/chalk/integration/**/*_test.rb']
+    t.test_files = FileList['test/chalk_ruby/integration/**/*_test.rb']
     t.verbose    = true
     t.warning    = false
   end
