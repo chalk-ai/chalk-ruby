@@ -1,5 +1,7 @@
 ## ChalkRuby Ruby
 
+[![Gem Version](https://badge.fury.io/rb/chalk_ruby.svg)](https://badge.fury.io/rb/chalk_ruby)
+
 Ruby client for Chalk!
 
 https://rubygems.org/gems/chalk_ruby
