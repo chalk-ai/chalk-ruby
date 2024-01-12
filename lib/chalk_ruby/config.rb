@@ -10,7 +10,8 @@ module ChalkRuby
                   :environment,
                   :query_timeout,
                   :api_timeout,
-                  :connect_timeout
+                  :connect_timeout,
+                  :additional_headers,
 
     # Creates a new ChalkRuby::Config object for use with ChalkRuby::Client.
     #
@@ -48,6 +49,7 @@ module ChalkRuby
       @query_timeout   = opts[:query_timeout] || Defaults::API_TIMEOUT
       @api_timeout     = opts[:api_timeout] || Defaults::QUERY_TIMEOUT
       @connect_timeout = opts[:connect_timeout] || Defaults::CONNECT_TIMEOUT
+      @additional_headers = opts[:additional_headers] || {}
 
       raise ChalkError, 'No Client ID provided, please set :client_id' if @client_id.nil?
       raise ChalkError, 'No Client Secret provided, please set :client_secret' if @client_secret.nil?

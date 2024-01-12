@@ -33,14 +33,16 @@ module ChalkRuby
       client_secret = nil,
       environment = nil,
       query_server = nil,
-      api_server = nil
+      api_server = nil,
+      additional_headers = {}
     )
       config = Config.new(
         client_id: client_id,
         client_secret: client_secret,
         environment: environment,
         query_server: query_server,
-        api_server: api_server
+        api_server: api_server,
+        additional_headers: additional_headers
       )
       create_with_config(config)
     end
@@ -229,7 +231,7 @@ module ChalkRuby
         'Authorization': 'Bearer ' + t.token,
         'X-Chalk-Env-Id': @config.environment || t.environment,
         'X-Chalk-Branch-Id': branch
-      }
+      }.merge(@config.additional_headers)
     end
 
     def get_unauthenticated_headers
@@ -237,7 +239,7 @@ module ChalkRuby
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'X-Chalk-Env-Id': @config.environment
-      }
+      }.merge(@config.additional_headers)
     end
 
     def query_server_host
