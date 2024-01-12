@@ -26,6 +26,9 @@ module ChalkRuby
     # @param api_server [String]
     #   ChalkRuby API server
     #
+    # @param additional_headers [Hash[String, String]]
+    #   Additional headers to be sent with every request. Typically not required.
+    #
     # @return self
     #
     def self.create(
@@ -33,14 +36,16 @@ module ChalkRuby
       client_secret = nil,
       environment = nil,
       query_server = nil,
-      api_server = nil
+      api_server = nil,
+      additional_headers = {}
     )
       config = Config.new(
         client_id: client_id,
         client_secret: client_secret,
         environment: environment,
         query_server: query_server,
-        api_server: api_server
+        api_server: api_server,
+        additional_headers: additional_headers
       )
       create_with_config(config)
     end
@@ -153,7 +158,7 @@ module ChalkRuby
           include_meta: include_meta || false,
           store_plan_stages: store_plan_stages || false
         },
-        headers: get_authenticated_headers(branch: branch)
+        headers: get_authenticated_engine_headers(branch: branch)
       )
     end
 
@@ -221,15 +226,17 @@ module ChalkRuby
       )
     end
 
-    def get_authenticated_headers(branch:)
-      t = valid_token
-      {
+    def get_authenticated_engine_headers(branch:)
+      t      = valid_token
+      tokens = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': 'Bearer ' + t.token,
         'X-Chalk-Env-Id': @config.environment || t.environment,
-        'X-Chalk-Branch-Id': branch
+        'X-Chalk-Branch-Id': branch,
+        'X-Chalk-Deployment-Type': branch.nil? ? 'engine' : 'branch'
       }
+      tokens.merge(@config.additional_headers)
     end
 
     def get_unauthenticated_headers
@@ -237,7 +244,7 @@ module ChalkRuby
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'X-Chalk-Env-Id': @config.environment
-      }
+      }.merge(@config.additional_headers)
     end
 
     def query_server_host

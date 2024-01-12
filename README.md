@@ -24,4 +24,4 @@ results = client.query(
 
 ## License
 
-The ChalkRuby Ruby API Client is an open-sourced software licensed under the [Apache 2 License](LICENSE.md).
+The Chalk Ruby API Client is an open-sourced software licensed under the [Apache 2 License](LICENSE.md).
