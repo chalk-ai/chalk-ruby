@@ -31,13 +31,13 @@ module ChalkRuby
     #   The API server to use.
     #   If not provided, it will be read from the CHALK_API_SERVER environment variable.
     #
-    # @option options [Integer?] :read_timeout
-    #   The timeout for read operations (in seconds).
+    # @option options [Float?] :query_timeout
+    #   The timeout for query operations (in seconds).
     #
-    # @option options [Integer?] :write_timeout
-    #   The timeout for write operations (in seconds).
+    # @option options [Float?] :api_timeout
+    #   The timeout for non-query API operations (in seconds).
     #
-    # @option options [Integer?] :connect_timeout
+    # @option options [Float?] :connect_timeout
     #   The timeout for connect operations (in seconds).
     #
     # @option options [Hash<String, String>?] :additional_headers
