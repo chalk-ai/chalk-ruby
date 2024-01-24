@@ -49,8 +49,8 @@ module ChalkRuby
       @environment        = opts[:environment] || ENV['CHALK_ACTIVE_ENVIRONMENT']
       @query_server       = opts[:query_server] || ENV['CHALK_QUERY_SERVER'] || Defaults::QUERY_SERVER
       @api_server         = opts[:api_server] || ENV['CHALK_API_SERVER'] || Defaults::API_SERVER
-      @query_timeout      = opts[:query_timeout] || Defaults::API_TIMEOUT
-      @api_timeout        = opts[:api_timeout] || Defaults::QUERY_TIMEOUT
+      @query_timeout      = opts[:query_timeout] || Defaults::QUERY_TIMEOUT
+      @api_timeout        = opts[:api_timeout] || Defaults::API_TIMEOUT
       @connect_timeout    = opts[:connect_timeout] || Defaults::CONNECT_TIMEOUT
       @additional_headers = opts[:additional_headers] || {}
 
