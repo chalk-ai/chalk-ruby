@@ -29,7 +29,8 @@ module ChalkRuby
         meta: Hash[String, String]?,
         explain: bool,
         include_meta: bool,
-        store_plan_stages: bool
+        store_plan_stages: bool,
+        request_timeout: Float?
       ) -> Hash[Symbol, untyped]
 
     private
