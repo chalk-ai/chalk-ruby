@@ -125,6 +125,9 @@ module ChalkRuby
     #     This option dramatically impacts the performance of the query,
     #     so it should only be used for debugging.
     #
+    # @option options [Float?] :timeout
+    #   Allows overriding default timeout for query operations (in seconds).
+    #
     # @return [Hash[Symbol, String]]
     #
     def query(
@@ -139,7 +142,8 @@ module ChalkRuby
       meta: nil,
       explain: nil,
       include_meta: nil,
-      store_plan_stages: nil
+      store_plan_stages: nil,
+      timeout: nil
     )
       query_server_request(
         method: :post,
@@ -158,7 +162,8 @@ module ChalkRuby
           include_meta: include_meta || false,
           store_plan_stages: store_plan_stages || false
         },
-        headers: get_authenticated_engine_headers(branch: branch)
+        headers: get_authenticated_engine_headers(branch: branch),
+        timeout:
       )
     end
 
@@ -214,12 +219,12 @@ module ChalkRuby
       )
     end
 
-    def query_server_request(method:, path:, body:, headers:)
+    def query_server_request(method:, path:, body:, headers:, timeout: nil)
       @transporter.send_request(
         method: method,
         host: query_server_host,
         path: path,
-        timeout: @config.query_timeout,
+        timeout: timeout || @config.query_timeout,
         connect_timeout: @config.connect_timeout,
         body: body,
         headers: headers
