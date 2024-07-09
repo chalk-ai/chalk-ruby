@@ -139,7 +139,8 @@ module ChalkRuby
       meta: nil,
       explain: nil,
       include_meta: nil,
-      store_plan_stages: nil
+      store_plan_stages: nil,
+      request_timeout: nil
     )
       query_server_request(
         method: :post,
@@ -159,6 +160,7 @@ module ChalkRuby
           store_plan_stages: store_plan_stages || false
         },
         headers: get_authenticated_engine_headers(branch: branch)
+        request_timeout: request_timeout
       )
     end
 
@@ -202,25 +204,25 @@ module ChalkRuby
 
     private
 
-    def api_server_request(method:, path:, body:, headers:)
+    def api_server_request(method:, path:, body:, headers:, request_timeout:)
       @transporter.send_request(
         method: method,
         host: @config.api_server,
         path: path,
         timeout: @config.api_timeout,
-        connect_timeout: @config.connect_timeout,
+        connect_timeout: request_timeout || @config.connect_timeout,
         body: body,
         headers: headers
       )
     end
 
-    def query_server_request(method:, path:, body:, headers:)
+    def query_server_request(method:, path:, body:, headers:, request_timeout:)
       @transporter.send_request(
         method: method,
         host: query_server_host,
         path: path,
         timeout: @config.query_timeout,
-        connect_timeout: @config.connect_timeout,
+        connect_timeout: request_timeout || @config.connect_timeout,
         body: body,
         headers: headers
       )
