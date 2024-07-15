@@ -34,11 +34,17 @@ module ChalkRuby
         end
 
         unless success?(http_response_code: response.status)
-          decoded_error = json_to_hash(json: response.error, symbolize_keys: true)
-          raise ChalkHttpError.new(
-            code: get_option(hash: decoded_error, key: 'status'),
-            message: get_option(hash: decoded_error, key: 'message')
-          )
+          begin
+            decoded_error = json_to_hash(json: response.error, symbolize_keys: true)
+            message = get_option(hash: decoded_error, key: 'description')
+          rescue MultiJson::ParseError
+            message = response.error
+          ensure
+            raise ChalkHttpError.new(
+              code: response.status,
+              message: message
+            )
+          end
         end
         json_to_hash(json: response.body, symbolize_keys: true)
       end
