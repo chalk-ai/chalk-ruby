@@ -163,7 +163,7 @@ module ChalkRuby
           store_plan_stages: store_plan_stages || false
         },
         headers: get_authenticated_engine_headers(branch: branch),
-        timeout: timeout
+        timeout:
       )
     end
 
