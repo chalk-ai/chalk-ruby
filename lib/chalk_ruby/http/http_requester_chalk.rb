@@ -16,9 +16,9 @@ module ChalkRuby
 
       def send_request(method:, host:, path:, timeout:, connect_timeout:, headers:, body:)
         response = @http_requester.send_request(
-          host: "https://httpstat.us",
+          host: host,
           method: method,
-          path: "/503",
+          path: path,
           body: body && to_json(body: body),
           headers: headers,
           timeout: timeout,
