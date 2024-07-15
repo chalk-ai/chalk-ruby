@@ -26,7 +26,6 @@ module ChalkRuby
         )
 
         if response.has_timed_out
-          puts response.inspect
           raise ChalkHttpError.new(code: Defaults::ERROR_TIMED_OUT, message: 'Request timed out')
         end
 
