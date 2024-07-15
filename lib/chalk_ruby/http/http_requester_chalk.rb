@@ -30,6 +30,7 @@ module ChalkRuby
         end
 
         if response.network_failure
+          puts response
           raise ChalkHttpError.new(code: 502, message: 'Network failure')
         end
 
