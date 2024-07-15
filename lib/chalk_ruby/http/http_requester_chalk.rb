@@ -16,9 +16,9 @@ module ChalkRuby
 
       def send_request(method:, host:, path:, timeout:, connect_timeout:, headers:, body:)
         response = @http_requester.send_request(
-          host: host,
+          host: "https://httpstat.us",
           method: method,
-          path: path,
+          path: "/503",
           body: body && to_json(body: body),
           headers: headers,
           timeout: timeout,
@@ -26,20 +26,29 @@ module ChalkRuby
         )
 
         if response.has_timed_out
+          puts response.inspect
           raise ChalkHttpError.new(code: Defaults::ERROR_TIMED_OUT, message: 'Request timed out')
         end
 
         if response.network_failure
-          puts response
           raise ChalkHttpError.new(code: 502, message: 'Network failure')
         end
 
         unless success?(http_response_code: response.status)
-          decoded_error = json_to_hash(json: response.error, symbolize_keys: true)
-          raise ChalkHttpError.new(
-            code: response.status,
-            message: response.reason_phrase
-          )
+          begin
+            decoded_error = json_to_hash(json: response.error, symbolize_keys: true)
+            code = get_option(hash: decoded_error, key: 'status')
+            message = get_option(hash: decoded_error, key: 'description')
+            raise ChalkHttpError.new(
+              code: code,
+              message: message
+            )
+          rescue MultiJson::ParseError
+            raise ChalkHttpError.new(
+              code: response.status,
+              message: response.error
+            )
+          end
         end
         json_to_hash(json: response.body, symbolize_keys: true)
       end
