@@ -8,7 +8,7 @@ https://rubygems.org/gems/chalk_ruby
 
 ## Getting Started
 
-First, install ChalkRuby Ruby API Client via the [RubyGems](https://rubygems.org/) package manager:
+First, install `chalk_ruby` via the [RubyGems](https://rubygems.org/) package manager:
 
 ```bash
 gem install chalk_ruby
