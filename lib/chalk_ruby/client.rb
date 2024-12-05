@@ -107,6 +107,12 @@ module ChalkRuby
     #     Typically, each query that you make from your application should have a name.
     #     Chalk will present metrics and dashboard functionality grouped by 'query_name'.
     #
+    # @param query_name_version [String?]
+    #    If query_name is specified, this specifies the version of the named query you're
+    #    making. This is only useful if you want your query to use a NamedQuery with a
+    #    specific name and a specific version. If a query_name has not been supplied, then
+    #    this parameter is ignored.
+    #
     # @param meta [Hash[String, String]?]
     #     Arbitrary `key:value` pairs to associate with a query.
     #
@@ -139,6 +145,7 @@ module ChalkRuby
       branch: nil,
       correlation_id: nil,
       query_name: nil,
+      query_name_version: nil,
       meta: nil,
       explain: nil,
       include_meta: nil,
@@ -157,6 +164,7 @@ module ChalkRuby
           branch_id: branch,
           correlation_id: correlation_id,
           query_name: query_name,
+          query_name_version: query_name_version,
           meta: meta,
           explain: explain || false,
           include_meta: include_meta || false,
