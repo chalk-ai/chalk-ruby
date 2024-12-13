@@ -38,7 +38,7 @@ module ChalkRuby
         timeout:,
         connect_timeout:
       )
-        connection                      = connection(host)
+        connection                      = connection(host[:api_server])
         connection.options.timeout      = timeout
         connection.options.open_timeout = connect_timeout
 

@@ -1,4 +1,5 @@
 require 'chalk_ruby/http/http_requester'
+require 'chalk_ruby/version'
 
 module ChalkRuby
   module Defaults
