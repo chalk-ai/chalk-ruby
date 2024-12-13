@@ -6,8 +6,6 @@ gemspec
 
 gem 'minitest-ci'
 
-gem 'grpc'
-
 group :development do
   gem 'git-precommit'
   gem 'steep' if RUBY_VERSION >= '2.5'
