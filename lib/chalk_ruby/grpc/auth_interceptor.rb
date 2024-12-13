@@ -5,10 +5,11 @@ require 'chalk_ruby/protos/chalk/server/v1/auth_services_pb'
 module ChalkRuby
   module Grpc
     class AuthInterceptor < GRPC::ClientInterceptor
-      def initialize(auth_stub, client_id, client_secret)
+      def initialize(auth_stub, client_id, client_secret, environment_id)
         @auth_stub = auth_stub
         @client_id = client_id
         @client_secret = client_secret
+        @environment_id = environment_id
         @token = nil
       end
 
@@ -29,7 +30,7 @@ module ChalkRuby
         # Add the token to the request's metadata
         metadata["authorization"] = "Bearer #{@token}"
         metadata["x-chalk-deployment-type"] = "engine-grpc"
-        metadata["x-chalk-env-id"] = "tmnmc9beyujew"
+        metadata["x-chalk-env-id"] = @environment_id
 
         # Proceed with the original call
         yield

@@ -2,6 +2,7 @@ require 'chalk_ruby/config'
 require 'grpc'
 
 module ChalkRuby
+
   class GrpcClient
     # Create a new client.
     #
@@ -27,7 +28,7 @@ module ChalkRuby
     #   Additional headers to be sent with every request. Typically not required.
     #
     # @return self
-    #
+
     def self.create(
       client_id = nil,
       client_secret = nil,
@@ -153,27 +154,24 @@ module ChalkRuby
       store_plan_stages: nil,
       timeout: nil
     )
-      query_server_request(
-        method: :post,
-        path: 'v1/query/online',
-        body: {
-          inputs: input,
-          outputs: output,
-          now: now,
-          staleness: staleness,
-          context: tags && { tags: tags },
-          branch_id: branch,
-          correlation_id: correlation_id,
-          query_name: query_name,
-          query_name_version: query_name_version,
-          meta: meta,
-          explain: explain || false,
-          include_meta: include_meta || false,
-          store_plan_stages: store_plan_stages || false
-        },
-        headers: get_authenticated_engine_headers(branch: branch),
-        timeout:
+      formatted_inputs = input.transform_values { |value| self.convert_to_protobuf_value(value) }
+
+      context = Chalk::Common::V1::OnlineQueryContext.new(
+        query_name: query_name,
+        query_name_version: query_name_version,
       )
+
+      r = Chalk::Common::V1::OnlineQueryRequest.new(
+        inputs: formatted_inputs,
+        outputs: output.map { |o| Chalk::Common::V1::OutputExpr.new(feature_fqn: o) },
+        context: context
+      )
+
+      if timeout.nil?
+        query_service.online_query(r)
+      else
+        query_service.online_query(r, deadline: Time.now + timeout)
+      end
     end
 
     def get_token
@@ -191,6 +189,14 @@ module ChalkRuby
       )
     end
 
+    def get_unauthenticated_headers
+      {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Chalk-Env-Id': @config.environment
+      }.merge(@config.additional_headers)
+    end
+
     # Initializes the ChalkRuby client. Generally, you should not need to call this directly.
     # Instead, use ChalkRuby::Client.create or ChalkRuby::Client.create_with_config.
     #
@@ -206,11 +212,11 @@ module ChalkRuby
     #   object used for the connection
     #
     def initialize(chalk_config, opts = {})
-      @token       = nil
-      @config      = chalk_config
-      adapter      = opts[:adapter] || Defaults::ADAPTER
-      logger       = opts[:logger] || LoggerHelper.create
-      requester    = opts[:http_requester] || Defaults::REQUESTER_CLASS.new(adapter: adapter, logger: logger)
+      @token = nil
+      @config = chalk_config
+      adapter = opts[:adapter] || Defaults::ADAPTER
+      logger = opts[:logger] || LoggerHelper.create
+      requester = opts[:http_requester] || Defaults::REQUESTER_CLASS.new(adapter: adapter, logger: logger)
       @transporter = Http::HttpRequesterChalk.new(requester: requester)
     end
 
@@ -258,7 +264,7 @@ module ChalkRuby
 
     def engine_interceptor
       if @engine_interceptor.nil?
-        @engine_interceptor = ChalkRuby::Grpc::AuthInterceptor.new(auth_service, @config.client_id, @config.client_secret)
+        @engine_interceptor = ChalkRuby::Grpc::AuthInterceptor.new(auth_service, @config.client_id, @config.client_secret, active_environment)
       end
 
       @engine_interceptor
@@ -266,7 +272,7 @@ module ChalkRuby
 
     def query_service
       if @query_service.nil?
-        @query_service = Chalk::Engine::V1::QueryService::Stub.new(query_server_host, GRPC::Core::ChannelCredentials.new(),  interceptors: [engine_interceptor])
+        @query_service = Chalk::Engine::V1::QueryService::Stub.new(query_server_host, GRPC::Core::ChannelCredentials.new(), interceptors: [engine_interceptor])
       end
 
       @query_service
@@ -275,13 +281,13 @@ module ChalkRuby
     def query_server_host
       explicit = @config.query_server
       ret =
-      if explicit.nil?
-        tok   = valid_token
-        found = @config.environment || tok.environment
-        ret = found.nil? ? Defaults::QUERY_SERVER : tok.engines[found] || Defaults::QUERY_SERVER
-      else
-        ret = explicit
-      end
+        if explicit.nil?
+          tok = valid_token
+          found = @config.environment || tok.environment
+          ret = found.nil? ? Defaults::QUERY_SERVER : tok.engines[found] || Defaults::QUERY_SERVER
+        else
+          ret = explicit
+        end
 
       if ret.start_with?('http://') or ret.start_with?('https://')
         ret = ret.sub('https://', '').sub("http://", '')
@@ -294,13 +300,40 @@ module ChalkRuby
       end
     end
 
+    def active_environment
+      @config.environment || valid_token.environment
+    end
+
     def valid_token
       if @token.nil? || @token.expired?
-        t      = get_token
+        t = get_token
         @token = t
         t
       else
         @token
+      end
+    end
+
+    def convert_to_protobuf_value(value)
+      case value
+      when NilClass
+        Google::Protobuf::Value.new(null_value: :NULL_VALUE)
+      when Float
+        Google::Protobuf::Value.new(number_value: value)
+      when Integer
+        Google::Protobuf::Value.new(number_value: value)
+      when String
+        Google::Protobuf::Value.new(string_value: value)
+      when TrueClass, FalseClass
+        Google::Protobuf::Value.new(bool_value: value)
+      when Hash
+        struct_value = Google::Protobuf::Struct.new(fields: value.transform_values { |v| convert_to_protobuf_value(v) })
+        Google::Protobuf::Value.new(struct_value: struct_value)
+      when Array
+        list_value = Google::Protobuf::ListValue.new(values: value.map { |v| convert_to_protobuf_value(v) })
+        Google::Protobuf::Value.new(list_value: list_value)
+      else
+        raise "Unsupported type: #{value.class}"
       end
     end
   end
