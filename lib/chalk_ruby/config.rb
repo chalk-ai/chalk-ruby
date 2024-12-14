@@ -1,5 +1,10 @@
 require 'faraday'
 require 'chalk_ruby/defaults'
+require 'chalk_ruby/logger_helper'
+require 'chalk_ruby/http/http_requester_chalk'
+require 'chalk_ruby/http/response'
+require 'chalk_ruby/token'
+
 
 module ChalkRuby
   class Config
