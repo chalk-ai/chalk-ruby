@@ -138,6 +138,35 @@ module ChalkRuby
       query_service.ping(Chalk::Engine::V1::PingRequest.new(num: 1))
     end
 
+    def query_bulk(
+      input:,
+      output:,
+      now: nil,
+      staleness: nil,
+      context: nil,
+      response_options: nil,
+      body_type: nil,
+      timeout: nil
+    )
+      # Convert input to feather format
+      inputs_feather = to_feather(input)
+
+      r = Chalk::Common::V1::OnlineQueryBulkRequest.new(
+        inputs_feather: inputs_feather,
+        outputs: output.map { |o| Chalk::Common::V1::OutputExpr.new(feature_fqn: o) },
+        staleness: staleness || {},
+        context: context || Chalk::Common::V1::OnlineQueryContext.new,
+        response_options: response_options || Chalk::Common::V1::OnlineQueryResponseOptions.new,
+        body_type: body_type || :FEATHER_BODY_TYPE_UNSPECIFIED
+      )
+
+      if timeout.nil?
+        query_service.online_query_bulk(r)
+      else
+        query_service.online_query_bulk(r, deadline: Time.now + timeout)
+      end
+    end
+
     def query(
       input:,
       output:,
@@ -334,7 +363,28 @@ module ChalkRuby
         Google::Protobuf::Value.new(list_value: list_value)
       else
         raise "Unsupported type: #{value.class}"
+        end
       end
+
+      private
+
+    def to_feather(input_hash)
+      require 'arrow'
+
+      # Ensure all values in the input hash are arrays
+      array_input_hash = input_hash.transform_values { |v| v.is_a?(Array) ? v : [v] }
+
+      # Create a table from the transformed input hash
+      table = Arrow::Table.new(array_input_hash).
+
+      # Write to feather format in memory
+      buffer = Arrow::ResizableBuffer.new(0)
+
+      output = Arrow::BufferOutputStream.new(buffer)
+
+      table.write_as_feather(output)
+
+      buffer.data.to_s.b
+    end
     end
   end
-end
