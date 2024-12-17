@@ -379,19 +379,23 @@ module ChalkRuby
 
       private
 
-      def to_feather(input_hash)
-        require 'arrow'
+    def to_feather(input_hash)
+      require 'arrow'
 
-        # Create a table from the input hash
-        table = Arrow::Table.new(input_hash)
-        
-        # Write to feather format in memory
-        buffer = Arrow::Buffer.new
-        Arrow::FeatherFileWriter.open(buffer) do |writer|
-          writer.write(table)
-        end
-        
-        buffer.data.to_s
-      end
+      # Ensure all values in the input hash are arrays
+      array_input_hash = input_hash.transform_values { |v| v.is_a?(Array) ? v : [v] }
+
+      # Create a table from the transformed input hash
+      table = Arrow::Table.new(array_input_hash).
+
+      # Write to feather format in memory
+      buffer = Arrow::ResizableBuffer.new(0)
+
+      output = Arrow::BufferOutputStream.new(buffer)
+
+      table.write_as_feather(output)
+
+      buffer.data.to_s.b
+    end
     end
   end
