@@ -1,5 +1,13 @@
 require 'chalk_ruby/config'
 require 'grpc'
+require 'google/protobuf/struct_pb'
+require 'chalk_ruby/protos/chalk/server/v1/auth_pb'
+require 'chalk_ruby/protos/chalk/server/v1/auth_services_pb'
+require 'chalk_ruby/protos/chalk/engine/v1/query_server_services_pb'
+require 'date'
+require 'chalk_ruby/grpc/auth_interceptor'
+require 'chalk_ruby/error'
+
 
 module ChalkRuby
 
@@ -175,18 +183,14 @@ module ChalkRuby
     end
 
     def get_token
-      Token.new(
-        api_server_request(
-          method: :post,
-          path: '/v1/oauth/token',
-          body: {
-            client_id: @config.client_id,
-            client_secret: @config.client_secret,
-            grant_type: 'client_credentials'
-          },
-          headers: get_unauthenticated_headers
+      response = @auth_stub.get_token(
+        Chalk::Server::V1::GetTokenRequest.new(
+          client_id: @config.client_id,
+          client_secret: @config.client_secret
         )
       )
+
+      response.access_token
     end
 
     def get_unauthenticated_headers
@@ -324,21 +328,21 @@ module ChalkRuby
     def convert_to_protobuf_value(value)
       case value
       when NilClass
-        Google::Protobuf::Value.new(null_value: :NULL_VALUE)
+        ::Google::Protobuf::Value.new(null_value: :NULL_VALUE)
       when Float
-        Google::Protobuf::Value.new(number_value: value)
+        ::Google::Protobuf::Value.new(number_value: value)
       when Integer
-        Google::Protobuf::Value.new(number_value: value)
+        ::Google::Protobuf::Value.new(number_value: value)
       when String
-        Google::Protobuf::Value.new(string_value: value)
+        ::Google::Protobuf::Value.new(string_value: value)
       when TrueClass, FalseClass
-        Google::Protobuf::Value.new(bool_value: value)
+        ::Google::Protobuf::Value.new(bool_value: value)
       when Hash
         struct_value = Google::Protobuf::Struct.new(fields: value.transform_values { |v| convert_to_protobuf_value(v) })
-        Google::Protobuf::Value.new(struct_value: struct_value)
+        ::Google::Protobuf::Value.new(struct_value: struct_value)
       when Array
         list_value = Google::Protobuf::ListValue.new(values: value.map { |v| convert_to_protobuf_value(v) })
-        Google::Protobuf::Value.new(list_value: list_value)
+        ::Google::Protobuf::Value.new(list_value: list_value)
       else
         raise "Unsupported type: #{value.class}"
       end

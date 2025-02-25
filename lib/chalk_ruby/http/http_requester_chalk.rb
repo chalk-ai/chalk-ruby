@@ -2,6 +2,7 @@ require 'faraday'
 # Default adapter needs to be required to be registered
 require 'faraday/net_http_persistent' unless Faraday::VERSION < '1'
 require 'chalk_ruby/error'
+require 'chalk_ruby/helpers'
 
 module ChalkRuby
   module Http
