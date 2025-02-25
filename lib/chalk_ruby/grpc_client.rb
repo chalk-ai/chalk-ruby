@@ -272,7 +272,14 @@ module ChalkRuby
 
     def query_service
       if @query_service.nil?
-        @query_service = Chalk::Engine::V1::QueryService::Stub.new(query_server_host, GRPC::Core::ChannelCredentials.new(), interceptors: [engine_interceptor])
+        channel_creds =
+          if @config.query_service_root_ca_path.nil?
+            GRPC::Core::ChannelCredentials.new
+          else
+            GRPC::Core::ChannelCredentials.new(File.read(@config.query_service_root_ca_path))
+          end
+
+        @query_service = Chalk::Engine::V1::QueryService::Stub.new(query_server_host, channel_creds, interceptors: [engine_interceptor])
       end
 
       @query_service
