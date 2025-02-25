@@ -32,6 +32,10 @@ module ChalkRuby
     API_TIMEOUT     = 300
     QUERY_TIMEOUT   = 1200
 
+    # GRPC
+    # ----------------------------------------
+    ROOT_CA_PATH = nil
+
     WAIT_TASK_DEFAULT_TIME_BEFORE_RETRY = 100
   end
 end
