@@ -11,12 +11,13 @@ module ChalkRuby
         @client_secret = client_secret
         @environment_id = environment_id
         @token = nil
+        @token_expiry = nil
       end
 
       def request_response(request:, call:, method:, metadata:)
-        # If we haven't fetched a token yet or if you'd like to handle token expiration,
-        # this is where you'd refresh it. For now, let's assume a long-lived token.
-        if @token.nil?
+
+        # Leave 1 minute buffer before refreshing auth token
+        if @token.nil? || @token_expiry.nil? || Time.now >= (@token_expiry - 60)
           response = @auth_stub.get_token(
             Chalk::Server::V1::GetTokenRequest.new(
               client_id: @client_id,
@@ -24,6 +25,9 @@ module ChalkRuby
             )
           )
           @token = response.access_token
+
+          # expires_in assumes to be 'seconds'
+          @token_expiry = Time.now + response.expires_in
         end
 
 
