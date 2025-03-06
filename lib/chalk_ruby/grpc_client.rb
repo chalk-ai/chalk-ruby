@@ -170,10 +170,46 @@ module ChalkRuby
       )
 
       if timeout.nil?
-        query_service.online_query_bulk(r)
+        response = query_service.online_query_bulk(r)
       else
-        query_service.online_query_bulk(r, deadline: Time.now + timeout)
+        response = query_service.online_query_bulk(r, deadline: Time.now + timeout)
       end
+
+      output_data = nil
+
+      if (!response.scalars_data.nil?) and response.scalars_data.length > 0
+        buffer = Arrow::Buffer.new(response.scalars_data)
+
+        # Create a buffer reader
+        buffer_reader = Arrow::BufferInputStream.new(buffer)
+
+        # Create an IPC reader from the buffer reader
+        reader = Arrow::FeatherFileReader.new(buffer_reader)
+
+        # Read the table
+
+
+        output_data = []
+
+        table = reader.read
+
+
+        field_names = table.schema.fields.map(&:name)
+        table.each_record do |r|
+          row = {}
+          field_names.each do |f|
+            row[f] = r[f]
+          end
+
+          output_data << row
+        end
+      end
+
+      {
+        data: output_data,
+        errors: response.errors,
+        meta: response.response_meta
+      }
     end
 
     def query(
