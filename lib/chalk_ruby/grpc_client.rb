@@ -159,6 +159,7 @@ module ChalkRuby
       # Convert input to feather format
       inputs_feather = to_feather(input)
 
+
       r = Chalk::Common::V1::OnlineQueryBulkRequest.new(
         inputs_feather: inputs_feather,
         outputs: output.map { |o| Chalk::Common::V1::OutputExpr.new(feature_fqn: o) },
@@ -386,7 +387,7 @@ module ChalkRuby
       array_input_hash = input_hash.transform_values { |v| v.is_a?(Array) ? v : [v] }
 
       # Create a table from the transformed input hash
-      table = Arrow::Table.new(array_input_hash).
+      table = Arrow::Table.new(array_input_hash)
 
       # Write to feather format in memory
       buffer = Arrow::ResizableBuffer.new(0)
@@ -395,7 +396,8 @@ module ChalkRuby
 
       table.write_as_feather(output)
 
-      buffer.data.to_s.b
+      # Remove trailing null bytes from the resizable buffer; the buffer is 512 aligned
+      buffer.data.to_s.b.gsub(/ARROW1(.*)ARROW1.*/m) {"ARROW1#{$1}ARROW1"}
     end
     end
   end
