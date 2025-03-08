@@ -154,8 +154,11 @@ module ChalkRuby
       context: nil,
       response_options: nil,
       body_type: nil,
-      timeout: nil
-    )
+      timeout: nil,
+      query_name: nil,
+      query_name_version: nil,
+      correlation_id: nil
+      )
       # Convert input to feather format
       inputs_feather = to_feather(input)
 
@@ -164,7 +167,7 @@ module ChalkRuby
         inputs_feather: inputs_feather,
         outputs: output.map { |o| Chalk::Common::V1::OutputExpr.new(feature_fqn: o) },
         staleness: staleness || {},
-        context: context || Chalk::Common::V1::OnlineQueryContext.new,
+        context: context || Chalk::Common::V1::OnlineQueryContext.new(query_name: query_name, query_name_version: query_name_version, correlation_id: correlation_id),
         response_options: response_options || Chalk::Common::V1::OnlineQueryResponseOptions.new,
         body_type: body_type || :FEATHER_BODY_TYPE_UNSPECIFIED
       )
