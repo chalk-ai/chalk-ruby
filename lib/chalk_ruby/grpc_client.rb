@@ -410,7 +410,7 @@ module ChalkRuby
         table = reader.read_all
       rescue => e
         # Fall back to feather format for backward compatibility
-        buffer_reader.rewind
+        # buffer_reader.rewind
         begin
           reader = Arrow::FeatherFileReader.new(buffer_reader)
           table = reader.read
