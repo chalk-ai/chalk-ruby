@@ -157,7 +157,8 @@ module ChalkRuby
       timeout: nil,
       query_name: nil,
       query_name_version: nil,
-      correlation_id: nil
+      correlation_id: nil,
+      planner_options: nil
       )
       # Convert input to feather format
       inputs_feather = to_feather(input)
@@ -167,7 +168,12 @@ module ChalkRuby
         inputs_feather: inputs_feather,
         outputs: output.map { |o| Chalk::Common::V1::OutputExpr.new(feature_fqn: o) },
         staleness: staleness || {},
-        context: context || Chalk::Common::V1::OnlineQueryContext.new(query_name: query_name, query_name_version: query_name_version, correlation_id: correlation_id),
+        context: context || Chalk::Common::V1::OnlineQueryContext.new(
+          query_name: query_name, 
+          query_name_version: query_name_version, 
+          correlation_id: correlation_id,
+          options: planner_options || {}
+        ),
         response_options: response_options || Chalk::Common::V1::OnlineQueryResponseOptions.new,
         body_type: body_type || :FEATHER_BODY_TYPE_UNSPECIFIED
       )
@@ -229,13 +235,16 @@ module ChalkRuby
       explain: nil,
       include_meta: nil,
       store_plan_stages: nil,
-      timeout: nil
+      timeout: nil,
+      planner_options: nil
     )
       formatted_inputs = input.transform_values { |value| self.convert_to_protobuf_value(value) }
 
       context = Chalk::Common::V1::OnlineQueryContext.new(
         query_name: query_name,
         query_name_version: query_name_version,
+        correlation_id: correlation_id,
+        options: planner_options || {}
       )
 
       r = Chalk::Common::V1::OnlineQueryRequest.new(
