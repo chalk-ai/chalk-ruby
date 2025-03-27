@@ -150,20 +150,7 @@ module ChalkRuby
       return {} if options_hash.nil?
 
       options_hash.transform_values do |value|
-        Google::Protobuf::Value.new(
-          case value
-          when String
-            { string_value: value }
-          when Integer
-            { number_value: value.to_f }
-          when TrueClass, FalseClass
-            { bool_value: value }
-          when NilClass
-            { null_value: :NULL_VALUE }
-          else
-            { string_value: value.to_s }
-          end
-        )
+        convert_to_protobuf_value(value)
       end
     end
 
