@@ -193,7 +193,7 @@ module ChalkRuby
           query_name: query_name,
           query_name_version: query_name_version,
           correlation_id: correlation_id,
-          options: convert_to_prot_values(planner_options)
+          options: convert_to_proto_values(planner_options)
         ),
         response_options: response_options || Chalk::Common::V1::OnlineQueryResponseOptions.new,
         body_type: body_type || :FEATHER_BODY_TYPE_UNSPECIFIED
