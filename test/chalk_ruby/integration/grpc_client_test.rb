@@ -16,6 +16,17 @@ RSpec.describe ChalkRuby::GrpcClient do
     it 'can perform bulk queries' do
       response = client.query_bulk(
         input: { 'user.id': 1 },
+        output: %w(user.id user.socure_score),
+        planner_options: {'defer_non_bus_persist_operators': "1"} # test planner option
+      )
+
+      expect(response).not_to be_nil
+      # The response should be a OnlineQueryBulkResponse
+      expect(response).to be_a(Chalk::Common::V1::OnlineQueryBulkResponse)
+    end
+    it 'can perform bulk queries without planner options' do
+      response = client.query_bulk(
+        input: { 'user.id': 1 },
         output: %w(user.id user.socure_score)
       )
 
