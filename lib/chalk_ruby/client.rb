@@ -171,7 +171,6 @@ module ChalkRuby
           include_meta: include_meta || false,
           store_plan_stages: store_plan_stages || false,
           planner_options: planner_options || {}
-
         },
         headers: get_authenticated_engine_headers(branch: branch),
         timeout:
