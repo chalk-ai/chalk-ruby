@@ -152,7 +152,6 @@ module ChalkRuby
       store_plan_stages: nil,
       timeout: nil,
       planner_options: nil
-
     )
       query_server_request(
         method: :post,
