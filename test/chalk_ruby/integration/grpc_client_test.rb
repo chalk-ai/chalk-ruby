@@ -21,8 +21,9 @@ RSpec.describe ChalkRuby::GrpcClient do
       )
 
       expect(response).not_to be_nil
-      # The response should be a OnlineQueryBulkResponse
-      expect(response).to be_a(Chalk::Common::V1::OnlineQueryBulkResponse)
+      # The response should have no errors and user_id of 1
+      expect(response[:errors]).to be_empty
+      expect(response[:data][0]['user.id']).to eq(1)
     end
     it 'can perform bulk queries without planner options' do
       response = client.query_bulk(
@@ -31,8 +32,9 @@ RSpec.describe ChalkRuby::GrpcClient do
       )
 
       expect(response).not_to be_nil
-      # The response should be a OnlineQueryBulkResponse
-      expect(response).to be_a(Chalk::Common::V1::OnlineQueryBulkResponse)
+      # The response should have no errors and user_id of 1
+      expect(response[:errors]).to be_empty
+      expect(response[:data][0]['user.id']).to eq(1)
     end
   end
 end
