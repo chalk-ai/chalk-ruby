@@ -146,6 +146,27 @@ module ChalkRuby
       query_service.ping(Chalk::Engine::V1::PingRequest.new(num: 1))
     end
 
+    def convert_to_proto_values(options_hash)
+      return {} if options_hash.nil?
+
+      options_hash.transform_values do |value|
+        Google::Protobuf::Value.new(
+          case value
+          when String
+            { string_value: value }
+          when Integer
+            { number_value: value.to_f }
+          when TrueClass, FalseClass
+            { bool_value: value }
+          when NilClass
+            { null_value: :NULL_VALUE }
+          else
+            { string_value: value.to_s }
+          end
+        )
+      end
+    end
+
     def query_bulk(
       input:,
       output:,
@@ -172,7 +193,7 @@ module ChalkRuby
           query_name: query_name,
           query_name_version: query_name_version,
           correlation_id: correlation_id,
-          options: planner_options || {}
+          options: convert_to_prot_values(planner_options)
         ),
         response_options: response_options || Chalk::Common::V1::OnlineQueryResponseOptions.new,
         body_type: body_type || :FEATHER_BODY_TYPE_UNSPECIFIED
