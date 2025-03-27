@@ -150,7 +150,8 @@ module ChalkRuby
       explain: nil,
       include_meta: nil,
       store_plan_stages: nil,
-      timeout: nil
+      timeout: nil,
+      planner_options: nil
     )
       query_server_request(
         method: :post,
@@ -168,10 +169,11 @@ module ChalkRuby
           meta: meta,
           explain: explain || false,
           include_meta: include_meta || false,
-          store_plan_stages: store_plan_stages || false
+          store_plan_stages: store_plan_stages || false,
+          planner_options: planner_options || {}
         },
         headers: get_authenticated_engine_headers(branch: branch),
-        timeout:
+        timeout: timeout
       )
     end
 
