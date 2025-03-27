@@ -23,3 +23,4 @@ RUN wget https://apache.jfrog.io/artifactory/arrow/ubuntu/apache-arrow-apt-sourc
     apt-get update && \
     apt-get install -y -V libarrow-dev=18.* libarrow-glib-dev=18.* libparquet-dev=18.* libarrow-acero-dev=18.* gir1.2-arrow-1.0=18.*
 
+RUN gem install bundler

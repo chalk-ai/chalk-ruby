@@ -173,7 +173,7 @@ module ChalkRuby
           planner_options: planner_options || {}
         },
         headers: get_authenticated_engine_headers(branch: branch),
-        timeout:
+        timeout: timeout
       )
     end
 
