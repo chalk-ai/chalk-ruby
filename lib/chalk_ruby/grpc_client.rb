@@ -169,8 +169,8 @@ module ChalkRuby
         outputs: output.map { |o| Chalk::Common::V1::OutputExpr.new(feature_fqn: o) },
         staleness: staleness || {},
         context: context || Chalk::Common::V1::OnlineQueryContext.new(
-          query_name: query_name, 
-          query_name_version: query_name_version, 
+          query_name: query_name,
+          query_name_version: query_name_version,
           correlation_id: correlation_id,
           options: planner_options || {}
         ),
