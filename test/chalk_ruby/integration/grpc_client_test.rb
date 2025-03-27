@@ -17,7 +17,9 @@ RSpec.describe ChalkRuby::GrpcClient do
       response = client.query_bulk(
         input: { 'user.id': 1 },
         output: %w(user.id user.socure_score),
-        planner_options: {'defer_non_bus_persist_operators': "1"} # test planner option
+        planner_options: {'defer_non_bus_persist_operators': "1"}, # test planner option
+        query_name: "planner_options_test",
+
       )
 
       expect(response).not_to be_nil
@@ -28,7 +30,8 @@ RSpec.describe ChalkRuby::GrpcClient do
     it 'can perform bulk queries without planner options' do
       response = client.query_bulk(
         input: { 'user.id': 1 },
-        output: %w(user.id user.socure_score)
+        output: %w(user.id user.socure_score),
+        query_name: "no_planner_options_test",
       )
 
       expect(response).not_to be_nil
