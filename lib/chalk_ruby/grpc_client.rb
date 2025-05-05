@@ -195,31 +195,7 @@ module ChalkRuby
       output_data = nil
 
       if (!response.scalars_data.nil?) and response.scalars_data.length > 0
-        buffer = Arrow::Buffer.new(response.scalars_data)
-
-        # Create a buffer reader
-        buffer_reader = Arrow::BufferInputStream.new(buffer)
-
-        # Create an IPC reader from the buffer reader
-        reader = Arrow::FeatherFileReader.new(buffer_reader)
-
-        # Read the table
-
-
-        output_data = []
-
-        table = reader.read
-
-
-        field_names = table.schema.fields.map(&:name)
-        table.each_record do |r|
-          row = {}
-          field_names.each do |f|
-            row[f] = r[f]
-          end
-
-          output_data << row
-        end
+        output_data = arrow_table_to_array(response.scalars_data)
       end
 
       {
@@ -435,6 +411,47 @@ module ChalkRuby
       end
 
       private
+
+    # Converts Arrow binary data to an array of hashes
+    # @param arrow_data [String] Binary Arrow data (IPC stream format)
+    # @return [Array<Hash>] Array of hashes with column name as keys and Ruby values
+    def arrow_table_to_array(arrow_data)
+      require 'arrow'
+      
+      buffer = Arrow::Buffer.new(arrow_data)
+      buffer_reader = Arrow::BufferInputStream.new(buffer)
+      
+      # Try IPC stream format first (which is what we expect from the query service)
+      begin
+        reader = Arrow::RecordBatchStreamReader.new(buffer_reader)
+        table = reader.read_all
+      rescue => e
+        # Fall back to feather format for backward compatibility
+        # buffer_reader.rewind
+        begin
+          reader = Arrow::FeatherFileReader.new(buffer_reader)
+          table = reader.read
+        rescue => e2
+          raise "Failed to parse Arrow data: #{e.message}, #{e2.message}"
+        end
+      end
+      
+      output_data = []
+      field_names = table.schema.fields.map(&:name)
+      
+      table.each_record do |r|
+        row = {}
+        field_names.each do |f|
+          value = r[f]
+          # Convert GLib::Bytes to Ruby String for binary and large string types
+          value = value.to_s if value.is_a?(GLib::Bytes)
+          row[f] = value
+        end
+        output_data << row
+      end
+      
+      output_data
+    end
 
     def to_feather(input_hash)
       require 'arrow'

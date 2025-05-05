@@ -1,17 +1,50 @@
-require 'rspec'
-require 'chalk_ruby'
+$LOAD_PATH.unshift File.expand_path('../../../../lib', __FILE__)
+# require 'rspec'
+# require 'chalk_ruby'
+# require 'chalk_ruby'
+
+require 'date'
+require 'rspec/autorun'
+require 'chalk_ruby/grpc_client'
+require 'chalk_ruby/grpc/auth_interceptor'
+require 'chalk_ruby/error'
+require 'chalk_ruby/protos/chalk/server/v1/auth_pb'
+require 'chalk_ruby/protos/chalk/server/v1/auth_services_pb'
+require 'chalk_ruby/protos/chalk/engine/v1/query_server_services_pb'
+require 'arrow'
+
+
+
 
 RSpec.describe ChalkRuby::GrpcClient do
-  describe '#query_bulk' do
+  describe '#query' do
     let(:client) do
-      ChalkRuby::GrpcClient.create(
-        ENV.fetch('CHALK_CLIENT_ID'),
-        ENV.fetch('CHALK_CLIENT_SECRET'),
-        ENV.fetch('CHALK_ENVIRONMENT', 'tmnmc9beyujew'),
-        ENV.fetch('CHALK_QUERY_SERVER', 'standard-gke.chalk-develop.gcp.chalk.ai'),
-        ENV.fetch('CHALK_API_SERVER', 'api.staging.chalk.ai:443')
+      ChalkRuby::GrpcClient.new(
+        ChalkRuby::Config.new(
+          query_server: "standard-gke.chalk-develop.gcp.chalk.ai",
+          api_server: "api.staging.chalk.ai:443",
+          client_id: CLIENT_ID,
+          client_secret: CLIENT_SECRET,
+          environment: "tmnmc9beyujew",
+          # api_timeout: 0.6, # seconds
+          # connect_timeout: 0.3, # seconds
+          # query_service_root_ca_path: "/Users/andrew/found_ca.pem" # path to the root ca for chalkai.internal.found.app,
+        )
       )
     end
+
+    # it 'can perform queries' do
+    #   response = client.query(
+    #     input: { 'business.id': 1 },
+    #     output: %w(business.id)
+    #   )
+    #
+    #   expect(response).not_to be_nil
+    #
+    #   puts response
+    #   # The response should be a OnlineQueryBulkResponse
+    #   # expect(response).to be_a(Chalk::Common::V1::OnlineQueryBulkResponse)
+    # end
 
     it 'can perform bulk queries' do
       response = client.query_bulk(
