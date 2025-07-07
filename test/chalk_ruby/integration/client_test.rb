@@ -8,7 +8,7 @@ CLIENT_SECRET = ''
 
 RSpec.describe 'Online query' do
   it 'should accept valid queries' do
-    client   = ChalkRuby::Client.create(CLIENT_ID, CLIENT_SECRET)
+    client   = ChalkRuby::Client.create(CLIENT_ID, CLIENT_SECRET, "tmnmrbyb8x53f")
     response = client.query(
       input: { 'user.id': 3454 },
       output: %w(user.id),

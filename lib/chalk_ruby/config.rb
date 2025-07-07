@@ -17,7 +17,8 @@ module ChalkRuby
                   :api_timeout,
                   :connect_timeout,
                   :query_service_root_ca_path,
-                  :additional_headers
+                  :additional_headers,
+                  :eagerly_initialize_connection_pool
 
     # Creates a new ChalkRuby::Config object for use with ChalkRuby::Client.
     #
@@ -52,6 +53,11 @@ module ChalkRuby
     # @option options [Hash<String, String>?] :additional_headers
     #  Additional headers to be sent with every request. Typically not required.
     #
+    # @option options [Boolean?] :eagerly_initialize_connection_pool
+    #  Whether to eagerly initialize connections to the query and API servers.
+    #  When true, connections will be pre-warmed during client initialization.
+    #  Default is false (lazy initialization).
+    #
     def initialize(opts = {})
       @client_id                        = opts[:client_id] || ENV['CHALK_CLIENT_ID']
       @client_secret                    = opts[:client_secret] || ENV['CHALK_CLIENT_SECRET']
@@ -63,6 +69,7 @@ module ChalkRuby
       @connect_timeout                  = opts[:connect_timeout] || Defaults::CONNECT_TIMEOUT
       @query_service_root_ca_path       = opts[:query_service_root_ca_path] || Defaults::ROOT_CA_PATH
       @additional_headers = opts[:additional_headers] || {}
+      @eagerly_initialize_connection_pool = opts[:eagerly_initialize_connection_pool] || false
 
       raise ChalkError, 'No Client ID provided, please set :client_id' if @client_id.nil?
       raise ChalkError, 'No Client Secret provided, please set :client_secret' if @client_secret.nil?
