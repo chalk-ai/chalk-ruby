@@ -29,6 +29,11 @@ module ChalkRuby
     # @param additional_headers [Hash[String, String]]
     #   Additional headers to be sent with every request. Typically not required.
     #
+    # @param eagerly_initialize_connection_pool [Boolean]
+    #   Whether to eagerly initialize connections to the query and API servers.
+    #   When true, connections will be pre-warmed during client initialization.
+    #   Default is false (lazy initialization).
+    #
     # @return self
     #
     def self.create(
@@ -37,7 +42,8 @@ module ChalkRuby
       environment = nil,
       query_server = nil,
       api_server = nil,
-      additional_headers = {}
+      additional_headers = {},
+      eagerly_initialize_connection_pool = false
     )
       config = Config.new(
         client_id: client_id,
@@ -45,7 +51,8 @@ module ChalkRuby
         environment: environment,
         query_server: query_server,
         api_server: api_server,
-        additional_headers: additional_headers
+        additional_headers: additional_headers,
+        eagerly_initialize_connection_pool: eagerly_initialize_connection_pool
       )
       create_with_config(config)
     end
@@ -213,9 +220,36 @@ module ChalkRuby
       logger       = opts[:logger] || LoggerHelper.create
       requester    = opts[:http_requester] || Defaults::REQUESTER_CLASS.new(adapter: adapter, logger: logger)
       @transporter = Http::HttpRequesterChalk.new(requester: requester)
+      
+      # Eagerly initialize connections if configured
+      if @config.eagerly_initialize_connection_pool
+        warm_connections
+      end
+    end
+
+    # Warm up connections to the API and query servers by establishing
+    # connections without making actual requests
+    def warm_connections
+      # Get the query server host
+      query_host = query_server_host
+      
+      # Warm up API server connection
+      warm_connection(@config.api_server)
+      
+      # Warm up query server connection
+      warm_connection(query_host)
     end
 
     private
+    
+    # Establish a connection to a host without making a request
+    def warm_connection(host)
+      # Access the underlying HTTP requester
+      requester = @transporter.instance_variable_get(:@http_requester)
+      
+      # This will create and cache the Faraday connection
+      requester.connection(host)
+    end
 
     def api_server_request(method:, path:, body:, headers:)
       @transporter.send_request(
