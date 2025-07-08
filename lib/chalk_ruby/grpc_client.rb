@@ -168,6 +168,9 @@ module ChalkRuby
       correlation_id: nil,
       planner_options: nil
       )
+      unless red_arrow_available?
+        raise NotImplementedError, "query_bulk requires the 'red-arrow' gem. Please add it to your Gemfile: gem 'red-arrow', '~> 18.0.0'"
+      end
       # Convert input to feather format
       inputs_feather = to_feather(input)
 
@@ -412,10 +415,22 @@ module ChalkRuby
 
       private
 
+    def red_arrow_available?
+      @red_arrow_available ||= begin
+        require 'arrow'
+        true
+      rescue LoadError
+        false
+      end
+    end
+
     # Converts Arrow binary data to an array of hashes
     # @param arrow_data [String] Binary Arrow data (IPC stream format)
     # @return [Array<Hash>] Array of hashes with column name as keys and Ruby values
     def arrow_table_to_array(arrow_data)
+      unless red_arrow_available?
+        raise NotImplementedError, "arrow_table_to_array requires the 'red-arrow' gem. Please add it to your Gemfile: gem 'red-arrow', '~> 18.0.0'"
+      end
       require 'arrow'
       
       buffer = Arrow::Buffer.new(arrow_data)
@@ -454,6 +469,9 @@ module ChalkRuby
     end
 
     def to_feather(input_hash)
+      unless red_arrow_available?
+        raise NotImplementedError, "to_feather requires the 'red-arrow' gem. Please add it to your Gemfile: gem 'red-arrow', '~> 18.0.0'"
+      end
       require 'arrow'
 
       # Ensure all values in the input hash are arrays
