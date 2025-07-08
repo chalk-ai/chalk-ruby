@@ -42,11 +42,11 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'multi_json', '~> 1.0'
   spec.add_dependency 'net-http-persistent'
-  spec.add_dependency 'red-arrow', '~> 18.0.0'
 
   spec.add_development_dependency 'httpclient'
   spec.add_development_dependency 'm'
   spec.add_development_dependency 'minitest'
   spec.add_development_dependency 'minitest-hooks'
   spec.add_development_dependency 'minitest-proveit'
+  spec.add_development_dependency 'red-arrow', '~> 18.0.0'
 end
