@@ -469,26 +469,55 @@ module ChalkRuby
     end
 
     def to_feather(input_hash)
-      unless red_arrow_available?
-        raise NotImplementedError, "to_feather requires the 'red-arrow' gem. Please add it to your Gemfile: gem 'red-arrow', '~> 18.0.0'"
-      end
+      raise NotImplementedError,
+            "Add `gem 'red-arrow', '~> 18.0'` to your Gemfile" unless red_arrow_available?
+
       require 'arrow'
 
-      # Ensure all values in the input hash are arrays
-      array_input_hash = input_hash.transform_values { |v| v.is_a?(Array) ? v : [v] }
+      # Normalise column data
+      array_input_hash = input_hash.transform_keys(&:to_s)
+                                   .transform_values { |v| v.is_a?(Array) ? v : [v] }
 
-      # Create a table from the transformed input hash
-      table = Arrow::Table.new(array_input_hash)
+      lengths = array_input_hash.values.map(&:length).uniq
+      raise ArgumentError, "Columns must be the same length (got #{lengths})" unless lengths.one?
 
-      # Write to feather format in memory
+      table  = Arrow::Table.new(array_input_hash)
+
       buffer = Arrow::ResizableBuffer.new(0)
-
       output = Arrow::BufferOutputStream.new(buffer)
 
+      # ──────────────────────────────────────────────────────────
       table.write_as_feather(output)
+      output.close                      # ← **critical**: flush footer
+      # ──────────────────────────────────────────────────────────
 
-      # Remove trailing null bytes from the resizable buffer; the buffer is 512 aligned
-      buffer.data.to_s.b.gsub(/ARROW1(.*)ARROW1.*/m) {"ARROW1#{$1}ARROW1"}
+      # The stream writes exactly `output.tell` bytes; slice to that.
+      bytes_written = output.tell
+      buffer.data.to_s.b.byteslice(0, bytes_written)
     end
     end
+
+    # def to_feather(input_hash)
+    #   unless red_arrow_available?
+    #     raise NotImplementedError, "to_feather requires the 'red-arrow' gem. Please add it to your Gemfile: gem 'red-arrow', '~> 18.0.0'"
+    #   end
+    #   require 'arrow'
+    #
+    #   # Ensure all values in the input hash are arrays
+    #   array_input_hash = input_hash.transform_values { |v| v.is_a?(Array) ? v : [v] }
+    #
+    #   # Create a table from the transformed input hash
+    #   table = Arrow::Table.new(array_input_hash)
+    #
+    #   # Write to feather format in memory
+    #   buffer = Arrow::ResizableBuffer.new(0)
+    #
+    #   output = Arrow::BufferOutputStream.new(buffer)
+    #
+    #   table.write_as_feather(output)
+    #
+    #   # Remove trailing null bytes from the resizable buffer; the buffer is 512 aligned
+    #   buffer.data.to_s.b.gsub(/ARROW1(.*)ARROW1.*/m) {"ARROW1#{$1}ARROW1"}
+    # end
+    # end
   end
