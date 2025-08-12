@@ -248,7 +248,7 @@ module ChalkRuby
     end
 
     def get_token
-      response = @auth_stub.get_token(
+      response = auth_service.get_token(
         Chalk::Server::V1::GetTokenRequest.new(
           client_id: @config.client_id,
           client_secret: @config.client_secret
